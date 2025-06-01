@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../App.vue'
+import Home from '../views/OmikujiPage.vue'
 //import Result from '../pages/Result.vue'
 
 const routes = [
