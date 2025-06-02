@@ -42,11 +42,32 @@ export function useVrmRenderer(){
 		scene.add(currentVRM.scene);
 	}
 
+	function setExpression(name){
+		if(!currentVRM) return;
+		const proxy = currentVRM.blendShapeProxy;
+		proxy.setValue(name, 1.0);
+		proxy.update();
+	}
+
+	function setPose(name){
+		if(!currentVRM) return;
+		
+		const armL = currentVRM.humanoid.getBoneNode('leftUpperArm');
+		const armR = currentVRM.humanoid.getBoneNode('rightUpperArm');
+
+		if(name === 'arms_up'){
+			armL.rotation.x = Math.PI / 4;
+			armR.rotation.x = Math.PI / 4;
+		}
+	}
+
 	return{
 		mountRef,
 		initRenderer,
 		loadVRM,
 		getCurrentVRM: ()=> currentVRM,
+		setExpression,
+		setPose,
 		getRenderer: ()=> renderer,
 		getCanvasElement: ()=> renderer.domElement,
 	}
