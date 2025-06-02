@@ -44,14 +44,27 @@ export function useVrmRenderer(){
 
 	function setExpression(name){
 		if(!currentVRM) return;
+
+		//VRM1.0~
+		const exprManager = currentVRM.expressionManager;
+		if(exprManager && exprManager.setValue){
+			exprManager.setValue(name, 1.0);
+			exprManager.update();
+			return;
+		}
+
 		const proxy = currentVRM.blendShapeProxy;
-		proxy.setValue(name, 1.0);
-		proxy.update();
+		if (proxy && proxy.setValue) {
+			proxy.setValue(name, 1.0);
+			proxy.update();
+			return;
+		}
+		console.warn('このVRMには表情制御機能がないようです');
 	}
 
 	function setPose(name){
 		if(!currentVRM) return;
-		
+
 		const armL = currentVRM.humanoid.getBoneNode('leftUpperArm');
 		const armR = currentVRM.humanoid.getBoneNode('rightUpperArm');
 
