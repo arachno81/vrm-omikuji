@@ -1,9 +1,9 @@
 import { ref } from 'vue';
-import * as THREE from 	'three';
+import * as THREE from 'three';
 import { loadVRMFromFile } from '@/utils/VRMLoader.js';
 
 let scene, camera, renderer;
-let currentVRM = null;
+let currentVRM = ref(null);
 
 export function useVrmRenderer(){
 	const mountRef = ref(null);
@@ -16,73 +16,94 @@ export function useVrmRenderer(){
 		renderer = new THREE.WebGLRenderer({ alpha: true });
 		renderer.setSize(512, 512);
 
-	const light = new THREE.DirectionalLight(0xffffff, 1);
-
-	light.position.set(1, 1, 1);
-	scene.add(light);
+		const light = new THREE.DirectionalLight(0xffffff, 1);
+		light.position.set(1, 1, 1);
+		scene.add(light);
 
 		mountRef.value.appendChild(renderer.domElement);
-
 		animate();
 	}
 
 	function animate(){
 		requestAnimationFrame(animate);
-		if(currentVRM) currentVRM.update(0.016);
+		if(currentVRM.value) currentVRM.value.update(0.016);
 		renderer.render(scene, camera);
 	}
 
 	async function loadVRM(file){
-		if(currentVRM){
-			scene.remove(currentVRM.scene);
-			currentVRM.dispose();
+		const vrm = await loadVRMFromFile(file);
+    
+		if (!vrm) {
+			console.warn("VRMの読み込みに失敗しました");
+			return;
 		}
 
-		currentVRM = await loadVRMFromFile(file);
-		scene.add(currentVRM.scene);
+		currentVRM.value = vrm;
+		scene.add(vrm.scene);
+		console.log("VRM を読み込みました:", vrm);
 	}
 
-	function setExpression(name){
-		if(!currentVRM) return;
+	function setExpression(name = 'happy'){
+		if (!currentVRM.value) {
+			console.warn(' VRMがまだ読み込まれていません！');
+			return;
+		}
 
-		//VRM1.0~
-		const exprManager = currentVRM.expressionManager;
-		if(exprManager && exprManager.setValue){
+		const exprManager = currentVRM.value.expressionManager;
+
+		if (!exprManager) {
+			console.warn('expressionManager が存在しません');
+			return;
+		}
+
+		const expressionMap = exprManager._expressionMap;
+		const availableExpressions = Object.keys(expressionMap || {});
+
+		console.log('使える表情一覧:', availableExpressions);
+
+		if (expressionMap?.[name]) {
 			exprManager.setValue(name, 1.0);
-			exprManager.update();
-			return;
+			exprManager.update?.();
+			console.log(`表情 '${name}' を適用しました`);
+		} else {
+			console.warn(`表情 '${name}' は見つかりませんでした`);
 		}
-
-		const proxy = currentVRM.blendShapeProxy;
-		if (proxy && proxy.setValue) {
-			proxy.setValue(name, 1.0);
-			proxy.update();
-			return;
-		}
-		console.warn('このVRMには表情制御機能がないようです');
 	}
 
 	function setPose(name){
-		if(!currentVRM) return;
+		if (!currentVRM.value) return;
+		console.log('ポーズ変更実行');
 
-		const armL = currentVRM.humanoid.getBoneNode('leftUpperArm');
-		const armR = currentVRM.humanoid.getBoneNode('rightUpperArm');
+		const armL = currentVRM.value.humanoid.getRawBoneNode('leftUpperArm');
+		const armR = currentVRM.value.humanoid.getRawBoneNode('rightUpperArm');
 
 		if(name === 'arms_up'){
-			armL.rotation.x = Math.PI / 4;
-			armR.rotation.x = Math.PI / 4;
+			if(armL && armR){
+				armL.rotation.x = Math.PI / 4;
+				armR.rotation.x = Math.PI / 4;
+			} else {
+				console.warn('ポーズ用のボーンが取得できませんでした');
+			}
 		}
 	}
 
-	return{
+	function renderOnce(){
+		console.log('renderOnce');
+		if(renderer && scene && camera){
+			renderer.render(scene, camera);
+		}
+	}
+
+	return {
 		mountRef,
 		initRenderer,
 		loadVRM,
-		getCurrentVRM: ()=> currentVRM,
+		currentVRM,
+		getCurrentVRM: () => currentVRM,
 		setExpression,
 		setPose,
-		getRenderer: ()=> renderer,
-		getCanvasElement: ()=> renderer.domElement,
-	}
+		renderOnce,
+		getRenderer: () => renderer,
+		getCanvasElement: () => renderer.domElement,
+	};
 }
-
