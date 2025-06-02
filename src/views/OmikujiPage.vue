@@ -11,12 +11,12 @@
 		>
 
 		<p class="text-gray-700 mb-4">ここにVRMファイルをドラッグアンドドロップ！</p>
-		<input type="file" accept=".vrm" @change="" class="mx-auto" />
+		<input type="file" accept=".vrm" @change="onFileChange" class="mx-auto" />
 	</div>
 
 	<!-- プレビュー -->
 	<div class="bg-white p-4 rounded shadow-md">
-		<canvas ref="" width="512" height="512" class="mx-auto border" />
+		<canvas ref="mountRef" width="512" height="512" class="mx-auto border" />
 	</div>
 
 	<!-- ボタン -->
@@ -41,3 +41,20 @@
 		<button class="text-blue-700 underline" @click="">Threadsでシェア</button>
 	</div>
 </template>
+
+<script setup>
+import { onMounted } from 'vue';
+import { useVrmRenderer } from '@/composables/useVrmRenderer.js'
+
+const { mountRef, initRenderer, loadVRM } = useVrmRenderer();
+
+onMounted(()=>{
+	initRenderer();
+});
+
+function onFileChange(e){
+	const file = e.target.file[0];
+	if(file) loadVRM(file);
+}
+
+</script>
