@@ -3,6 +3,10 @@ export const reasons =[];
 export const targets = [];
 export const actions = [];
 
+export const expressions = [];
+export const poses = [];
+export const backgrounds = [];
+
 function randomItem(arr){
 	return arr[Math.floor(Math.random() * arr.length)];
 }
