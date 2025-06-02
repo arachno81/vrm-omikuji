@@ -1,11 +1,25 @@
-export const omikuji = [];
-export const reasons =[];
-export const targets = [];
-export const actions = [];
+export const omikuji = [
+	'test',
+];
+export const reasons =[
+	'aaa',
+];
+export const targets = [
+	'bbb',
+];
+export const actions = [
+	'ccc',
+];
 
-export const expressions = [];
-export const poses = [];
-export const backgrounds = [];
+export const expressions = [
+	'joy',
+];
+export const poses = [
+	'idle',
+];
+export const backgrounds = [
+	'test.png',
+];
 
 function randomItem(arr){
 	return arr[Math.floor(Math.random() * arr.length)];
