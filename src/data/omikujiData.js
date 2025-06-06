@@ -12,7 +12,11 @@ export const actions = [
 ];
 
 export const expressions = [
-	'joy',
+	'happy',
+	'angry',
+	'blink',
+	'fun',
+	'surprised',
 ];
 export const poses = [
 	'idle',
