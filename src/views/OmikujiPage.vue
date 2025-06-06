@@ -16,7 +16,7 @@
 
 	<!-- プレビュー -->
 	<div class="bg-white p-4 rounded shadow-md">
-		<canvas ref="mountRef" width="512" height="512" class="mx-auto border" />
+		<div ref="mountRef" width="512" height="512" class="mx-auto border"></div>
 	</div>
 
 	<!-- ボタン -->
