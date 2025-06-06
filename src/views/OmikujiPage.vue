@@ -33,6 +33,13 @@
 			>
 			結果をダウンロード！
 		</button>
+  <!-- 一旦前後入れ替えボタンをここに -->
+  <button
+    @click="toggleRotation"
+    class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
+  >
+    前後を入れ替える
+  </button>
 	</div>
 
 	<!-- SNSシェア -->
@@ -46,7 +53,7 @@
 import { onMounted } from 'vue';
 import { useVrmRenderer } from '@/composables/useVrmRenderer.js'
 
-const { mountRef, initRenderer, loadVRM } = useVrmRenderer();
+const { mountRef, initRenderer, loadVRM, toggleModelRotation } = useVrmRenderer();
 
 onMounted(()=>{
 	initRenderer();
@@ -55,6 +62,10 @@ onMounted(()=>{
 function onFileChange(e){
 	const file = e.target.files[0];
 	if(file) loadVRM(file);
+}
+
+function toggleRotation(){
+	toggleModelRotation();
 }
 
 </script>
