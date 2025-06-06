@@ -30,18 +30,39 @@ export function useVrmRenderer(){
 		renderer.render(scene, camera);
 	}
 
-	async function loadVRM(file){
+	async function loadVRM(file) {
 		const vrm = await loadVRMFromFile(file);
-    
+
 		if (!vrm) {
 			console.warn("VRMの読み込みに失敗しました");
 			return;
 		}
 
+		// VRMを現在のモデルとして保持
 		currentVRM.value = vrm;
+
+		// 表示シーンに追加
 		scene.add(vrm.scene);
-		console.log("VRM を読み込みました:", vrm);
+
+		// 行列の初期更新）
+		scene.updateMatrixWorld(true);
+
+		console.log(`VRMが正常に読み込まれました！: ${vrm.meta?.title || 'タイトル未設定'}`);
 	}
+
+	function toggleModelRotation(){
+		if(!currentVRM.value) return;
+		const currentRotation = currentVRM.value.scene.rotation.y;
+		currentVRM.value.scene.rotation.y = currentRotation === 0 ? Math.PI : 0;
+
+		//入れ替え中髪がボッサボサになるのを阻止
+		if (vrm.springBoneManager?.reset) {
+			vrm.springBoneManager.reset(); // 揺れものをゼロにリセット
+			console.log("springBoneをリセットしました");
+		}
+		console.log('アバターの向きの前後を入れ替えました！')
+	}
+
 
 	function setExpression(name = 'happy'){
 		if (!currentVRM.value) {
@@ -105,5 +126,6 @@ export function useVrmRenderer(){
 		renderOnce,
 		getRenderer: () => renderer,
 		getCanvasElement: () => renderer.domElement,
+		toggleModelRotation,
 	};
 }
