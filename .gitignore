@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 src/assets/backgrounds/
+public/poses/
 
 # Editor directories and files
 .vscode/*
